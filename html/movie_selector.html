@@ -1,0 +1,99 @@
+<head>
+    <link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <link rel="stylesheet" href="../css/jquery.icalendar.css" type="text/css" media="screen" title="no title"
+          charset="utf-8">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="../lib/jquery.icalendar.js"></script>
+
+    <script>
+        function makeICalendar(event) {
+            var limit75 = function(text) {
+                var out = '';
+                while (text.length > 75) {
+                    out += text.substr(0, 75) + '\n';
+                    text = ' ' + text.substr(75);
+                }
+                out += text;
+                return out;
+            };
+            return 'BEGIN:VCALENDAR\n' +
+                    'VERSION:2.0\n' +
+                    'PRODID:jquery.icalendar\n' +
+                    'METHOD:PUBLISH\n' +
+                    'BEGIN:VEVENT\n' +
+                    'UID:' + new Date().getTime() + '@' +
+                    (window.location.href.replace(/^[^\/]*\/\/([^\/]*)\/.*$/, '$1') || 'localhost') + '\n' +
+                    'DTSTAMP:' + $.icalendar.formatDateTime(new Date()) + '\n' +
+                    (event.url ? limit75('URL:' + event.url) + '\n' : '') +
+                    (event.contact ? limit75('MAILTO:' + event.contact) + '\n' : '') +
+                    limit75('TITLE:' + event.title) + '\n' +
+                    'DTSTART:' + $.icalendar.formatDate(event.start) + '\n' +
+                    'DTEND:' + $.icalendar.formatDate(event.end) + '\n' +
+                    (event.summary ? limit75('SUMMARY:' + event.summary) + '\n' : '') +
+                    (event.description ? limit75('DESCRIPTION:' + event.description) + '\n' : '') +
+                    (event.location ? limit75('LOCATION:' + event.location) + '\n' : '') +
+                    (event.recurrence ? makeRecurrence(event.recurrence) + '\n' : '') +
+                    'END:VEVENT\n' +
+                    'END:VCALENDAR';
+        }
+        function getMovieEvent(movie_hash) {
+            var raw_release_date = movie_hash.release_date;
+            clean_release_date = raw_release_date.replace(/st|nd|rd|th/, "");
+            var start_date = new Date(clean_release_date);
+//            console.log("date", clean_release_date);
+//            console.log("date", d.getFullYear(), d.getMonth() + 1, d.getUTCDate());
+            MovieDate = {start: new Date(start_date.getFullYear(), start_date.getMonth(), start_date.getUTCDate()),
+                end: new Date(start_date.getFullYear(), start_date.getMonth(), start_date.getUTCDate()),
+                title: movie_hash.title,
+                summary: movie_hash.title,
+                description: movie_hash.title + ' will be released today',
+                location: 'In a cinema near you.',
+                url: 'http://trailers.apple.com'};
+            return MovieDate;
+        }
+        function popUp(data) {
+            alert("pop poop" + data);
+            console.log(data);
+        }
+
+        function create_pop_html(movie_hash) {
+            var movie_title = "<h2>" + movie_hash.title + "</h2>"
+            var release_date = "<h3>Release Date: " + movie_hash.release_date + "</h3>"
+            var eve = makeICalendar(getMovieEvent(movie_hash));
+            var url_string = "http://keith-wood.name/iCalEcho.php?content=" + escape(eve);
+            var ical_link = '<br/><a target="_blank" href="' + url_string + '">download as .ics</a>';
+            create_iCal_event(movie_hash);
+            return movie_title + release_date + ical_link
+        }
+
+        function create_iCal_event(movie_hash) {
+
+            $('#defaultICal').icalendar($.extend(
+                    {sites: ['google', 'yahoo'], compact: true}, getMovieEvent(movie_hash)));
+//            $('#downloadableICal').icalendar($.extend({sites: ['outlook'],
+//                echoUrl: 'http://keith-wood.name/iCalEcho.php',  compact: true}, MovieDate));
+        }
+
+        function start() {
+            var movie = chrome.extension.getBackgroundPage().selectedMovie;
+//	console.log("selected movie: "+ movie.title);
+//	console.log("release date: "+ movie.release_date);
+//	var movie_details = document.getElementById("movie_details");
+            var content_html = create_pop_html(movie);
+            $('#movie_details').html(content_html);
+        }
+
+    </script>
+</head>
+<body onload="start();">
+<div id="mt_close_icon">
+    <a href="#" onclick="window.close()">X</a>
+</div>
+
+<div id="movie_details" onclick="window.closed()">
+
+</div>
+<div>click the icons below to add to your online calendars</div>
+<div id="defaultICal"></div>
+
+</body>

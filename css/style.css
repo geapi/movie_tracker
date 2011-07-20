@@ -1,0 +1,30 @@
+body {
+    min-width: 357px;
+    overflow-x: hidden;
+}
+
+#movie_details{
+    clear: both;
+}
+
+#movie_details > h2 {
+
+}
+
+img {
+    margin: 5px;
+    border: 2px solid black;
+    vertical-align: middle;
+    width: 75px;
+    height: 75px;
+}
+
+#mt_close_icon {
+    float: right;
+}
+
+#mt_close_icon a {
+    color: black;
+    text-decoration: none;
+    font: Arial;
+}
