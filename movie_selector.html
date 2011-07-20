@@ -1,0 +1,44 @@
+<head>
+    <link rel="stylesheet" href="/style.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+
+    <script>
+
+        function scan_movies() {
+            var show_times = $('div').find('h3.title span#view-showtimes').text().trim();
+            var copy_right = $('div').find('h3.title span.sosumi').text().trim();
+            var movie_title = $('div').find('h3.title').text().trim();
+            //movie_title = movie_title.substring(show_times.length, (movie_title.length - copy_right.length)).trim();
+            //movie_title = movie_title - copy_right;
+            //alert(movie_title + "\n" + show_times + "\n" + copy_right);
+            /*	var img = document.createElement("image");
+             img.src = constructImageURL(photo);
+             document.body.appendChild(img);*/
+            chrome.windows.getLastFocused(popUp);
+            console.log("looking for movies");
+            var mt = $('div h3.title').text();
+            console.log('mt' + movie_title + mt);
+
+        }
+        function popUp(data) {
+            alert("pop poop" + data);
+            console.log(data);
+        }
+        function start() {
+            var movie = chrome.extension.getBackgroundPage().selectedMovie;
+            console.log("selected movie: " + movie);
+            var movie_details = document.getElementById("movie_details");
+            $('#movie_details').html("<h3>" + movie + "</h3>");
+        }
+        ;
+
+    </script>
+</head>
+<body onload="start();">
+<a href="#" onclick="window.close()">X</a>
+
+<div id="movie_details" onclick="window.close()">
+
+</div>
+
+</body>

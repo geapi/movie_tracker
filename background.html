@@ -1,0 +1,40 @@
+<script>
+// Global accessor that the popup uses.
+var movies = {};
+var selectedMovie = null;
+var selectedId = null;
+function findMovies(tabId) {
+  chrome.tabs.sendRequest(tabId, {}, function(movie) {
+    movies[tabId] = movie;
+    if (!movie) {
+      chrome.pageAction.hide(tabId);
+    } else {
+      chrome.pageAction.show(tabId);
+      if (selectedId == tabId) {
+        updateSelected(tabId);
+      }
+    }
+  });
+}
+function updateSelected(tabId) {
+  selectedMovie = movies[tabId];
+  if (selectedMovie)
+    chrome.pageAction.setTitle({tabId:tabId, title:selectedMovie});
+}
+
+chrome.tabs.onUpdated.addListener(function(tabId, change, tab) {
+  if (change.status == "complete") {
+    findMovies(tabId);
+  }
+});
+
+chrome.tabs.onSelectionChanged.addListener(function(tabId, info) {
+  selectedId = tabId;
+  updateSelected(tabId);
+});
+
+// Ensure the current selected tab is set up.
+chrome.tabs.getSelected(null, function(tab) {
+  findMovies(tab.id);
+});
+</script>
